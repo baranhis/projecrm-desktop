@@ -1,0 +1,23 @@
+/* Mobil kabuğun panel-adresi ekranıyla aynı dil: marka mavisi, DM Sans yerine sistem yazı tipi. */
+:root {
+  --zemin: #f5f8fc; --kart: #ffffff; --metin: #0f172a; --ikincil: #5b6b82; --kenar: #d9e2ec; --marka: #1f4e79; --tehlike: #dc2626;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --zemin: #0b1220; --kart: #111a2c; --metin: #e6ebf3; --ikincil: #9fb0c6; --kenar: #233248; --marka: #2c6cb0; }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { display: grid; place-items: center; background: var(--zemin); color: var(--metin); font: 15px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; -webkit-user-select: none; user-select: none; }
+.kart { width: min(440px, 92vw); padding: 36px 32px; }
+.rozet { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 14px; background: var(--marka); color: #fff; display: grid; place-items: center; font-size: 28px; font-weight: 700; }
+h1 { margin: 0; text-align: center; font-size: 26px; font-weight: 700; }
+h1 span { color: var(--marka); }
+.alt { margin: 6px 0 28px; text-align: center; color: var(--ikincil); }
+label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
+input { width: 100%; padding: 12px 14px; font-size: 16px; color: var(--metin); background: var(--kart); border: 1px solid var(--kenar); border-radius: 12px; outline: none; -webkit-user-select: text; user-select: text; }
+input:focus { border-color: var(--marka); box-shadow: 0 0 0 3px color-mix(in srgb, var(--marka) 20%, transparent); }
+.hata { margin: 10px 0 0; font-size: 13px; color: var(--tehlike); }
+button { width: 100%; margin-top: 20px; padding: 14px; font-size: 15px; font-weight: 600; color: #fff; background: var(--marka); border: 0; border-radius: 12px; cursor: pointer; }
+button:hover { filter: brightness(1.08); }
+button:disabled { opacity: .6; cursor: default; }

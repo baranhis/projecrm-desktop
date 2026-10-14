@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proje CRM</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <main class="kart">
+      <div class="rozet">P</div>
+      <h1>Proje <span>CRM</span></h1>
+      <p class="alt">Panel adresinizi yazın; giriş panelin kendi ekranında yapılır.</p>
+      <form id="form" novalidate>
+        <label for="adres">Panel Adresi</label>
+        <input id="adres" name="adres" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ornek.projecrm.com" />
+        <p id="hata" class="hata" hidden></p>
+        <button id="devam" type="submit">Devam</button>
+      </form>
+    </main>
+  </body>
+</html>
