@@ -107,6 +107,30 @@ fn panel_ayarla(app: AppHandle, adres: String) -> Result<String, String> {
 
 // ---------------------------------------------------------------- gezinme / indirme
 
+/// Panel sayfasına enjekte edilir (her yüklemede, belge başında). Panelin
+/// "yeni sekmede aç" bağlantıları (target=_blank: wa.me, tel:, mailto:, harici
+/// siteler) ve window.open çağrıları, web görüntüleyicide yeni pencere isteği
+/// olarak kalır ve gezinme kancasına hiç ulaşmaz. Betik bunları üst düzey
+/// gezinmeye çevirir; gezinme kancası (gezinmeye_izin) panel dışı olanları
+/// sisteme yollar ve pencerede kalmasını engeller. Mobil kabuktaki
+/// onShouldStartLoadWithRequest ile aynı davranış. Sayfa içeriğine dokunmaz.
+const BAGLANTI_BETIGI: &str = r#"(function(){
+  if (window.__kabukBaglanti) return; window.__kabukBaglanti = true;
+  var DIS = /^(tel|sms|mailto|whatsapp|maps|facetime):/i;
+  document.addEventListener('click', function(ev){
+    if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey) return;
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.href || '';
+    if (a.target === '_blank' || DIS.test(href) || (/^https?:/i.test(href) && new URL(href).origin !== location.origin)) {
+      ev.preventDefault(); ev.stopPropagation();
+      location.href = href;
+    }
+  }, true);
+  var asilOpen = window.open;
+  window.open = function(u){ if (u) { location.href = String(u); return null; } return asilOpen.apply(window, arguments); };
+})();"#;
+
 /// Panel dışı her şey sistem uygulamasına gider; kabuk yalnız kendi yerel ekranını
 /// ve seçili panel origin'ini yükler.
 fn gezinmeye_izin<R: Runtime>(app: &AppHandle<R>, url: &Url) -> bool {
@@ -244,6 +268,7 @@ pub fn run() {
                 .inner_size(1280.0, 820.0)
                 .min_inner_size(960.0, 640.0)
                 .center()
+                .initialization_script(BAGLANTI_BETIGI)
                 .on_navigation(move |url| gezinmeye_izin(&nav_handle, url))
                 .on_download(move |_webview, olay| {
                     match olay {
