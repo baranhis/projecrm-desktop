@@ -33,12 +33,27 @@ jobs:
         with:
           workspaces: src-tauri
       - run: npm ci
+      # Noter onayı için App Store Connect API anahtarı (.p8) gizli değişkenden dosyaya yazılır.
+      - name: Apple API anahtarını hazırla
+        if: matrix.platform == 'macos-latest' && env.APPLE_API_KEY_P8 != ''
+        shell: bash
+        env:
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          echo "$APPLE_API_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+          echo "APPLE_API_KEY_PATH=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # macOS imzalama/noter (eklenince devreye girer): APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD,
-          # APPLE_SIGNING_IDENTITY, APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
-          # Otomatik güncelleme imzası: TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+          # macOS imzalama: Developer ID sertifikası (p12, base64) + parola + kimlik
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # macOS noter onayı: App Store Connect API anahtarı (boşsa noter atlanır, imza yine atılır)
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          # Otomatik güncelleme imzası (sonraki adım): TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Proje CRM ${{ github.ref_name }}"
